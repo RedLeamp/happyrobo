@@ -1,0 +1,33 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/loookup/robotics/happy-robot2/devel_isolated/omo_r1mini_simple_position_controller/include/**",
+        "/home/loookup/robotics/happy-robot2/devel_isolated/omo_r1mini_bringup/include/**",
+        "/home/loookup/robotics/happy-robot2/devel_isolated/cartographer_ros_msgs/include/**",
+        "/home/loookup/robotics/happy-robot2/install_isolated/include/**",
+        "/home/loookup/robotics/happy-robot/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/loookup/robotics/happy-robot2/devel_isolated/cartographer/include/**",
+        "/home/loookup/robotics/happy-robot/devel_isolated/cartographer/include/**",
+        "/home/loookup/robotics/happy-robot/src/fast_gicp/include/**",
+        "/home/loookup/robotics/new_robo/src/happy_robot/include/**",
+        "/home/loookup/robotics/happy-robot/src/hdl_graph_slam/include/**",
+        "/home/loookup/robotics/happy-robot/src/jackal_velodyne/include/**",
+        "/home/loookup/robotics/happy-robot/src/ndt_omp/include/**",
+        "/home/loookup/robotics/happy-robot/src/velodyne_simulator/velodyne_gazebo_plugins/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

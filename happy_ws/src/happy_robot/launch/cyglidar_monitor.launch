@@ -1,0 +1,9 @@
+<launch>
+  <include file="$(find cyglidar_d2_ros1)/launch/cyglidar_monitor.launch">
+    <arg name="number" value="1" />
+    <arg name="port" value="1" />
+    <arg name="run_mode" value="0" doc="version type [0(2D), 1(3D), 2(2D/3D)]"/>
+    <arg name="laser_tf" default="0.23 0.17 0.34 0 0 0 map laser_frame_0 15" />
+  </include>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cyglidar_d2_ros1)/rviz/test.rviz"/>
+</launch>

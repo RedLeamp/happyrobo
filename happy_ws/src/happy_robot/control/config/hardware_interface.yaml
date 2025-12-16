@@ -1,0 +1,15 @@
+real:
+  joints:
+    - front_left_wheel
+    - rear_left_wheel
+    - front_right_wheel
+    - rear_right_wheel
+
+  hardware_interface:
+    loop_hz: 50          # 제어 루프 주기
+    hardware_interface: "hardware_interface::VelocityJointInterface"  # 속도 명령 인터페이스
+    joints:              # 조인트 목록 (위와 동일)
+      - front_left_wheel
+      - rear_left_wheel
+      - front_right_wheel
+      - rear_right_wheel

@@ -1,0 +1,690 @@
+<?xml version="1.0"?>
+<robot name="jackal" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:property name="PI" value="3.1415926535897931" />
+
+  <xacro:property name="hori_ang" value="${PI*60/180}" />
+  <xacro:property name="vert_ang" value="${PI*32.5/180}" />
+
+  <xacro:property name="width" value="5.7" />
+  <xacro:property name="length" value="2.5" />
+  <xacro:property name="height" value="0.5" />
+
+  <xacro:property name="wheelbase" value="0.262" />
+  <xacro:property name="track" value="0.37559" />
+  <xacro:property name="wheel_vertical_offset" value="0.0345" />
+  <xacro:property name="footprint_vertical_offset" value="-0.0655" />
+
+  <xacro:property name="wheel_radius" value="0.098" />
+  <xacro:property name="wheel_width" value="0.040" />
+
+  <xacro:property name="chassis_length" value="0.420" />
+  <xacro:property name="chassis_width" value="0.310" />
+  <xacro:property name="chassis_height" value="0.184" />
+
+  <xacro:property name="dummy_inertia" value="1e-09"/>
+
+  <xacro:property name="mount_spacing" value="0.120" />
+
+  <material name="dark_grey"><color rgba="0.2 0.2 0.2 1.0" /></material>
+  <material name="light_grey"><color rgba="0.4 0.4 0.4 1.0" /></material>
+  <material name="yellow"><color rgba="0.8 0.8 0.0 1.0" /></material>
+  <material name="black"><color rgba="0.15 0.15 0.15 1.0" /></material>
+
+  <xacro:macro name="wheel" params="prefix *joint_pose">
+
+    <link name="${prefix}_wheel_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+        <geometry>
+          <mesh filename="package://jackal_description/meshes/jackal-wheel.stl"/>
+        </geometry>
+        <material name="black" />
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="0.477"/>
+        <inertia
+          ixx="0.0013" ixy="0" ixz="0"
+          iyy="0.0024" iyz="0"
+          izz="0.0013"/>
+      </inertial>
+    </link>
+
+    <gazebo reference="${prefix}_wheel_link">
+      <material>Gazebo/DarkGrey</material>
+    </gazebo>
+
+    <joint name="${prefix}_wheel" type="continuous">
+      <parent link="chassis_link"/>
+      <child link="${prefix}_wheel_link" />
+      <xacro:insert_block name="joint_pose" />
+      <axis xyz="0 1 0" />
+    </joint>
+
+    <!-- In reality, Jackal has only two motors, one per side. However, it's more
+         straightforward for Gazebo to simulate as if there's an actuator per wheel. -->
+    <transmission name="${prefix}_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_wheel">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="${prefix}_actuator">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+  </xacro:macro>
+
+  <xacro:wheel prefix="front_left">
+    <origin xyz="${wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+  </xacro:wheel>
+  <xacro:wheel prefix="front_right">
+    <origin xyz="${wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+  </xacro:wheel>
+  <xacro:wheel prefix="rear_left">
+    <origin xyz="${-wheelbase/2} ${track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+  </xacro:wheel>
+  <xacro:wheel prefix="rear_right">
+    <origin xyz="${-wheelbase/2} ${-track/2} ${wheel_vertical_offset}" rpy="0 0 0" />
+  </xacro:wheel>
+
+  <link name="base_link"></link>
+
+  <joint name="base_link_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="base_link"/>
+    <child link="chassis_link" />
+  </joint>
+
+  <link name="chassis_link">
+    <visual>
+      <origin xyz="0 0 ${footprint_vertical_offset}" rpy="${PI/2} 0 ${PI/2}"/>
+      <geometry>
+        <mesh filename="package://jackal_description/meshes/jackal-base.stl"/>
+      </geometry>
+      <material name="dark_grey" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${chassis_height/2}"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <!-- Center of mass -->
+      <origin xyz="0.012  0.002 0.067" rpy="0 0 0"/>
+      <mass value="16.523"/>
+      <!-- Moments of inertia: ( chassis without wheels ) -->
+      <inertia
+        ixx="0.3136" ixy="-0.0008" ixz="0.0164"
+        iyy="0.3922" iyz="-0.0009"
+        izz="0.4485"/>
+      </inertial>
+  </link>
+
+  <link name="fenders_link">
+    <visual>
+      <origin xyz="0 0 ${footprint_vertical_offset}" rpy="${PI/2} 0 ${PI/2}"/>
+      <geometry>
+        <mesh filename="package://jackal_description/meshes/jackal-fenders.stl"/>
+      </geometry>
+      <material name="yellow" />
+    </visual>
+  </link>
+  <joint name="fenders_joint" type="fixed">
+    <parent link="chassis_link" />
+    <child link="fenders_link" />
+  </joint>
+
+  <!-- TODO: Make this internal_imu_link or something, and use a mixed-in xacro
+       to supply the joint between it and imu_link. This is important so that imu_link
+       always points to the "active" IMU. When an upgrade IMU is connected, the
+       internal_imu_link should remain, but imu_link should point to the upgrade one. -->
+  <link name="imu_link">
+    <inertial>
+      <mass value="0.001"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="${dummy_inertia}" ixy="0.0" ixz="0.0" iyy="${dummy_inertia}" iyz="0.0" izz="${dummy_inertia}"/>
+    </inertial>
+  </link>
+  <joint name="imu_joint" type="fixed">
+    <parent link="chassis_link" />
+    <child link="imu_link" />
+  </joint>
+
+  <!-- TODO: Same note as applies to imu_link -->
+  <link name="navsat_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.026" length="0.016" />
+      </geometry>
+      <origin xyz="0 0 0.008" />
+      <material name="black" />
+    </visual>
+  </link>
+  <joint name="navsat_joint" type="fixed">
+    <parent link="chassis_link" />
+    <child link="navsat_link" />
+    <origin xyz="-0.180 0.126 0.1815" />
+  </joint>
+
+  <link name="mid_mount"></link>
+  <joint name="mid_mount_joint" type="fixed">
+    <parent link="chassis_link" />
+    <child link="mid_mount" />
+    <origin xyz="0 0 ${chassis_height}" />
+  </joint>
+
+  <link name="rear_mount"></link>
+  <joint name="rear_mount_joint" type="fixed">
+    <parent link="mid_mount" />
+    <child link="rear_mount" />
+    <origin xyz="${-mount_spacing} 0 0" />
+  </joint>
+
+  <link name="front_mount"></link>
+  <joint name="front_mount_joint" type="fixed">
+    <parent link="mid_mount" />
+    <child link="front_mount" />
+    <origin xyz="${mount_spacing} 0 0" />
+  </joint>
+
+  <!-- Bring in simulation data for Gazebo. -->
+  <xacro:include filename="$(find happy_robo)/urdf/jackal.gazebo" />
+
+  <!-- Optional standard accessories, including their simulation data. The rendering
+       of these into the final description is controlled by optenv variables, which
+       default each one to off.-->
+  <xacro:include filename="$(find happy_robo)/urdf/accessories.urdf.xacro" />
+
+  <!-- Optional custom includes. -->
+  <xacro:if value="$(optenv JACKAL_URDF_EXTRAS 0)">
+    <xacro:include filename="$(env JACKAL_URDF_EXTRAS)" />
+  </xacro:if>
+
+
+  <link name="sigbot_base_01">
+  </link>
+
+  <joint name="sigbot_joint_01" type="fixed">
+    <parent link="base_link" />
+    <child link="sigbot_base_01" />
+    <origin xyz="${width/2} ${length/2} ${height}" rpy="0 0 0"/>
+  </joint>
+
+    <gazebo reference="sigbot_base_01">
+        <sensor type="ray" name="sigbot_laser_01">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="sigbot_node_01" filename="libgazebo_ros_laser.so">
+                <topicName>/sigbot/scan01</topicName>
+                <frameName>sigbot_base_01</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+  <gazebo reference="sigbot_base_01">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="gpu_ray" name="nanosystems_sensor1">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>15</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>160</samples>
+            <resolution>1</resolution>
+            <min_angle>${-hori_ang}</min_angle>
+            <max_angle>${hori_ang}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>60</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${vert_ang}</min_angle>
+            <max_angle>${vert_ang}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.05</min>
+          <max>2.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_controller1" filename="libgazebo_ros_velodyne_gpu_laser.so">
+        <topicName>/sigbot/point01</topicName>
+        <frameName>sigbot_base_01</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+    <link name="sigbot_base_02">
+  </link>
+
+  <joint name="sigbot_joint_02" type="fixed">
+    <parent link="base_link" />
+    <child link="sigbot_base_02" />
+    <origin xyz="${width/2} ${-length/2} ${height}" rpy="0 0 0"/>
+  </joint>
+
+    <gazebo reference="sigbot_base_02">
+        <sensor type="ray" name="sigbot_laser_02">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>false</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="sigbot_node_02" filename="libgazebo_ros_laser.so">
+                <topicName>/sigbot/scan02</topicName>
+                <frameName>sigbot_base_02</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+      <gazebo reference="sigbot_base_02">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="gpu_ray" name="nanosystems_sensor2">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>15</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>160</samples>
+            <resolution>1</resolution>
+            <min_angle>${-hori_ang}</min_angle>
+            <max_angle>${hori_ang}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>60</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${vert_ang}</min_angle>
+            <max_angle>${vert_ang}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.05</min>
+          <max>2.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_controller2" filename="libgazebo_ros_velodyne_gpu_laser.so">
+        <topicName>/sigbot/point02</topicName>
+        <frameName>sigbot_base_02</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+    <link name="sigbot_base_03">
+  </link>
+
+  <joint name="sigbot_joint_03" type="fixed">
+    <parent link="base_link" />
+    <child link="sigbot_base_03" />
+    <origin xyz="${-width/2} ${-length/2} ${height}" rpy="0 0 ${PI}"/>
+  </joint>
+
+    <gazebo reference="sigbot_base_03">
+        <sensor type="ray" name="sigbot_laser_03">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>false</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="sigbot_node_03" filename="libgazebo_ros_laser.so">
+                <topicName>/sigbot/scan03</topicName>
+                <frameName>sigbot_base_03</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+      <gazebo reference="sigbot_base_03">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="gpu_ray" name="nanosystems_sensor3">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>15</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>160</samples>
+            <resolution>1</resolution>
+            <min_angle>${-hori_ang}</min_angle>
+            <max_angle>${hori_ang}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>60</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${vert_ang}</min_angle>
+            <max_angle>${vert_ang}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.05</min>
+          <max>2.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_controller3" filename="libgazebo_ros_velodyne_gpu_laser.so">
+        <topicName>/sigbot/point03</topicName>
+        <frameName>sigbot_base_03</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+      <link name="sigbot_base_04">
+  </link>
+
+  <joint name="sigbot_joint_04" type="fixed">
+    <parent link="base_link" />
+    <child link="sigbot_base_04" />
+    <origin xyz="${-width/2} ${length/2} ${height}" rpy="0 0 ${PI}"/>
+  </joint>
+
+    <gazebo reference="sigbot_base_04">
+        <sensor type="ray" name="sigbot_laser_04">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>false</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="sigbot_node_04" filename="libgazebo_ros_laser.so">
+                <topicName>/sigbot/scan04</topicName>
+                <frameName>sigbot_base_04</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+      <gazebo reference="sigbot_base_04">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="gpu_ray" name="sigbot_sensor4">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>15</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>160</samples>
+            <resolution>1</resolution>
+            <min_angle>${-hori_ang}</min_angle>
+            <max_angle>${hori_ang}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>60</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${vert_ang}</min_angle>
+            <max_angle>${vert_ang}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.05</min>
+          <max>2.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_controller4" filename="libgazebo_ros_velodyne_gpu_laser.so">
+        <topicName>/sigbot/point04</topicName>
+        <frameName>sigbot_base_04</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+    <!-- <link name="scan_base_02">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://happy_robo/meshes/lidars/hokuyo/hokuyo3d.stl"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="scan_joint2" type="fixed">
+    <parent link="base_link" />
+    <child link="scan_base_02" />
+    <origin xyz="0 ${length/2} ${height}" rpy="0 ${PI/6} ${PI/2}"/>
+  </joint>
+
+  <gazebo reference="scan_base_02">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="gpu_ray" name="nanosystems_sensor2">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>5</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>320</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${hori_ang}</min_angle>
+            <max_angle>${hori_ang}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>240</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${vert_ang}</min_angle>
+            <max_angle>${vert_ang}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.1</min>
+          <max>12.5</max>
+          <resolution>0.015</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_controller2" filename="libgazebo_ros_velodyne_gpu_laser.so">
+        <topicName>/nanosystems_points_02</topicName>
+        <frameName>scan_base_02</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+    <link name="scan_base_03">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://happy_robo/meshes/lidars/hokuyo/hokuyo3d.stl"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="scan_joint3" type="fixed">
+    <parent link="base_link" />
+    <child link="scan_base_03" />
+    <origin xyz="${-width/2} 0 ${height}" rpy="0 ${PI/6} ${PI}"/>
+  </joint>
+
+  <gazebo reference="scan_base_03">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="gpu_ray" name="nanosystems_sensor3">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>5</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>320</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${hori_ang}</min_angle>
+            <max_angle>${hori_ang}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>240</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${vert_ang}</min_angle>
+            <max_angle>${vert_ang}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.1</min>
+          <max>12.5</max>
+          <resolution>0.015</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_controller3" filename="libgazebo_ros_velodyne_gpu_laser.so">
+        <topicName>/nanosystems_points_03</topicName>
+        <frameName>scan_base_03</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+    <link name="scan_base_04">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://happy_robo/meshes/lidars/hokuyo/hokuyo3d.stl"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="scan_joint4" type="fixed">
+    <parent link="base_link" />
+    <child link="scan_base_04" />
+    <origin xyz="0 ${-length/2} ${height}" rpy="0 ${PI/6} ${3*PI/2}"/>
+  </joint>
+
+  <gazebo reference="scan_base_04">
+    <material>Gazebo/FlatBlack</material>
+    <sensor type="gpu_ray" name="nanosystems_sensor4">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>5</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>320</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${hori_ang}</min_angle>
+            <max_angle>${hori_ang}</max_angle>
+          </horizontal>
+          <vertical>
+            <samples>240</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${vert_ang}</min_angle>
+            <max_angle>${vert_ang}</max_angle>
+          </vertical>
+        </scan>
+        <range>
+          <min>0.1</min>
+          <max>12.5</max>
+          <resolution>0.015</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser_controller4" filename="libgazebo_ros_velodyne_gpu_laser.so">
+        <topicName>/nanosystems_points_04</topicName>
+        <frameName>scan_base_04</frameName>
+      </plugin>
+    </sensor>
+  </gazebo> -->
+
+  <!-- VLP-16 -->
+  <!-- <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+  <xacro:VLP-16 parent="base_link" name="velodyne" topic="/velodyne_points" hz="10" samples="440" gpu="true" lasers="16" max_range="100" max_angle="${PI/2}" min_angle="${-PI/2}">
+    <origin xyz="1.3 0 0.4" rpy="0 0 0" />
+  </xacro:VLP-16>
+
+    <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+  <xacro:VLP-16 parent="base_link" name="velodyne2" topic="/velodyne_points2" hz="10" samples="440" gpu="true" lasers="16" max_range="100" max_angle="${PI/2}" min_angle="${-PI/2}">
+    <origin xyz="-1.3 0 0.4" rpy="0 0 ${PI}" />
+  </xacro:VLP-16> -->
+  
+  <!-- VHDL-32E -->
+  <!-- <xacro:include filename="$(find velodyne_description)/urdf/HDL-32E.urdf.xacro"/>
+  <HDL-32E parent="base_link" name="velodyne_2" topic="/velodyne_points_2" hz="10" samples="1024" gpu="false">
+    <origin xyz="0 0 0.6" rpy="0 0 0" />
+  </HDL-32E> -->
+  
+</robot>

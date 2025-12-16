@@ -1,0 +1,871 @@
+<?xml version="1.0"?>
+<robot name="swerve_drive_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="PI" value="3.1415926535897931" />
+
+  <!-- Properties -->
+  <xacro:property name="wheelbase" value="5.65"/>
+  <xacro:property name="track_width" value="2.5"/>
+  <xacro:property name="wheel_radius" value="0.102"/>
+  <xacro:property name="robot_height" value="0.2"/>
+  <xacro:property name="chassis_length" value="6.0"/>
+  <xacro:property name="chassis_width" value="3.0"/>
+  <xacro:property name="suspension_length" value="0.1"/> <!-- 서스펜션 링크 길이 -->
+  <xacro:property name="suspension_travel" value="0.075"/>
+  <xacro:property name="pillar_length" value="2.0"/> <!-- 기둥 길이 -->
+  <xacro:property name="lidar_wheelbase" value="5.90"/>
+  <xacro:property name="lidar_track_width" value="2.75"/>
+  <xacro:property name="lidar_height" value="0.34" />
+  <xacro:property name="hori_ang" value="${PI*60/180}" />
+  <xacro:property name="vert_ang" value="${PI*32.5/180}" />
+
+  <xacro:property name="lidar_height" value="-${pillar_length}" />
+
+  <!-- Materials -->
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1"/> <!-- 흰색 재질 -->
+  </material>
+
+  <!-- Base Link (Robot Chassis) -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${robot_height}"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${robot_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="10.0" ixy="0.0" ixz="0.0" iyy="10.0" iyz="0.0" izz="10.0"/>
+    </inertial>
+  </link>
+
+    <joint name="imu_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+    </joint>
+
+    <link name="imu_link">
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+	            <box size="0.1 0.1 0.1"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+	            <box size="0.1 0.1 0.1"/>
+            </geometry>
+            <material name="orange"/>
+        </visual>
+
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="0.1"/>
+            <inertia
+	        ixx="0.00016667" ixy="0.0" ixz="0.0"
+	        iyy="0.00016667" iyz="0.0"
+	        izz="0.00016667"/>
+        </inertial>
+    </link>
+
+<gazebo reference="imu_link">
+        <gravity>true</gravity>
+        <sensor name="imu_sensor" type="imu">
+            <always_on>true</always_on>
+            <update_rate>50</update_rate>
+            <visualize>true</visualize>
+            <topic>__default_topic__</topic>
+            <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+                <topicName>/imu/data_raw</topicName>
+                <bodyName>imu_link</bodyName>
+                <updateRateHZ>50.0</updateRateHZ>
+                <gaussianNoise>0.0</gaussianNoise>
+                <xyzOffset>0 0 0</xyzOffset>
+                <rpyOffset>0 0 0</rpyOffset>
+                <frameName>imu_link</frameName>
+                <initialOrientationAsReference>false</initialOrientationAsReference>
+            </plugin>
+            <pose>0 0 0 0 0 0</pose>
+        </sensor>
+    </gazebo>
+
+  <!-- Macro for Swerve Module -->
+  <xacro:macro name="swerve_module" params="prefix x y drive_axis steer_motor_id drive_motor_id">
+    <!-- Steering Link -->
+    <link name="${prefix}_steering_link">
+      <visual>
+        <geometry>
+          <cylinder radius="0.15" length="0.2"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="0.15" length="0.2"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="1.0"/>
+        <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_steering_joint" type="continuous">
+      <parent link="base_link"/>
+      <child link="${prefix}_steering_link"/>
+      <origin xyz="${x} ${y} -${robot_height/2}" rpy="0 0 0"/>
+      <axis xyz="0 0 -1"/> <!-- Steering: +angle is CCW -->
+      <dynamics damping="1.0" friction="0.5"/>
+    </joint>
+
+    <!-- Pillar Link (2.0m White Pillar) -->
+    <link name="${prefix}_pillar_link">
+      <visual>
+        <geometry>
+          <cylinder radius="0.1" length="${pillar_length}"/>
+        </geometry>
+        <origin xyz="0 0 -${pillar_length/2}"/> <!-- 중심을 기둥 중간에 -->
+        <material name="white"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="0.1" length="${pillar_length}"/>
+        </geometry>
+        <origin xyz="0 0 -${pillar_length/2}"/>
+      </collision>
+      <inertial>
+        <mass value="2.0"/> <!-- 2m 기둥의 질량 -->
+        <inertia ixx="0.333" ixy="0.0" ixz="0.0" iyy="0.333" iyz="0.0" izz="0.02"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_pillar_joint" type="fixed">
+      <parent link="${prefix}_steering_link"/>
+      <child link="${prefix}_pillar_link"/>
+      <origin xyz="0 0 -0.2"/> <!-- steering_link 아래에 고정 -->
+    </joint>
+
+    <!-- Suspension Link -->
+    <link name="${prefix}_suspension_link">
+      <visual>
+        <geometry>
+          <cylinder radius="0.1" length="${suspension_length}"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="0.1" length="${suspension_length}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0.5"/>
+        <inertia ixx="0.005" ixy="0.0" ixz="0.0" iyy="0.005" iyz="0.0" izz="0.005"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_suspension_joint" type="prismatic">
+      <parent link="${prefix}_pillar_link"/>
+      <child link="${prefix}_suspension_link"/>
+      <origin xyz="0 0 -${pillar_length}" rpy="0 0 0"/> <!-- 기둥 끝에 위치 -->
+      <axis xyz="0 0 1"/> <!-- z축 수직 이동 -->
+      <limit lower="-${suspension_travel}" upper="${suspension_travel}" effort="1000.0" velocity="1.0"/>
+      <dynamics damping="15.0" friction="0.01"/> <!-- 최적화된 댐핑 -->
+    </joint>
+
+    <!-- Wheel Link -->
+    <link name="${prefix}_wheel_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://happy_robo/meshes/wheel.dae"/>
+        </geometry>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="0.1"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0.5"/>
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_wheel_joint" type="continuous">
+      <parent link="${prefix}_suspension_link"/>
+      <child link="${prefix}_wheel_link"/>
+      <origin xyz="0 0 -${suspension_length + 0.102}" rpy="0 0 0"/> <!-- 바퀴 반지름 고려 -->
+      <axis xyz="${drive_axis}"/>
+      <dynamics damping="10.0" friction="0"/>
+    </joint>
+
+    <!-- Transmission for Steering -->
+    <transmission name="${prefix}_steering_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_steering_joint">
+        <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="steering_motor_${steer_motor_id}">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <!-- Transmission for Wheel -->
+    <transmission name="${prefix}_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="${prefix}_wheel_joint">
+        <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="drive_motor_${drive_motor_id}">
+        <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+
+    <!-- Gazebo properties for Wheel -->
+    <gazebo reference="${prefix}_wheel_link">
+      <material>Gazebo/Black</material>
+      <mu1>0.6</mu1> <!-- 마찰 최적화 -->
+      <mu2>0.6</mu2>
+      <kp>1e4</kp> <!-- 접촉 강성 감소 -->
+      <kd>300.0</kd> <!-- 접촉 댐핑 증가 -->
+    </gazebo>
+
+    <!-- Gazebo properties for Pillar -->
+    <gazebo reference="${prefix}_pillar_link">
+      <material>Gazebo/White</material> <!-- 흰색 시각화 -->
+    </gazebo>
+
+    <!-- Gazebo properties for Suspension -->
+    <gazebo reference="${prefix}_suspension_joint">
+      <springReference>0.0</springReference>
+      <springStiffness>800.0</springStiffness> <!-- 최적화 -->
+      <springDamping>80.0</springDamping> <!-- 최적화 -->
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Instantiate Swerve Modules -->
+  <xacro:swerve_module prefix="front_left" x="${wheelbase/2}" y="${track_width/2}" drive_axis="0 -1 0" steer_motor_id="5" drive_motor_id="1"/>
+  <xacro:swerve_module prefix="front_right" x="${wheelbase/2}" y="-${track_width/2}" drive_axis="0 1 0" steer_motor_id="6" drive_motor_id="2"/>
+  <xacro:swerve_module prefix="rear_left" x="-${wheelbase/2}" y="${track_width/2}" drive_axis="0 -1 0" steer_motor_id="7" drive_motor_id="3"/>
+  <xacro:swerve_module prefix="rear_right" x="-${wheelbase/2}" y="-${track_width/2}" drive_axis="0 1 0" steer_motor_id="8" drive_motor_id="4"/>
+
+  <!-- Gazebo Plugins -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/swerve_drive_robot</robotNamespace>
+    </plugin>
+  </gazebo>
+
+  <!-- Gazebo properties for Base Link -->
+  <gazebo reference="base_link">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+
+
+
+    <link name="laser_frame_0">
+  </link>
+  <joint name="laser_joint_0" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_frame_0" />
+    <origin xyz="${lidar_wheelbase/2} ${lidar_track_width/2} ${lidar_height}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="laser_frame_1">
+  </link>
+  <joint name="laser_joint_1" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_frame_1" />
+    <origin xyz="${lidar_wheelbase/2} ${-lidar_track_width/2} ${lidar_height}" rpy="0 0 0"/>
+  </joint>
+
+  <link name="laser_frame_2">
+  </link>
+  <joint name="laser_joint_2" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_frame_2" />
+    <origin xyz="${-lidar_wheelbase/2} ${-lidar_track_width/2} ${lidar_height}" rpy="0 0 ${PI}"/>
+  </joint>
+
+  <link name="laser_frame_3">
+  </link>
+  <joint name="laser_joint_3" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_frame_3" />
+    <origin xyz="${-lidar_wheelbase/2} ${lidar_track_width/2} ${lidar_height}" rpy="0 0 ${PI}"/>
+  </joint>
+
+  <link name="laser_frame_4">
+  </link>
+  <joint name="laser_joint_4" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_frame_4" />
+    <origin xyz="${lidar_wheelbase/2} ${lidar_track_width/2} ${lidar_height}" rpy="0 0 ${PI/2}"/>
+  </joint>
+
+  <link name="laser_frame_5">
+  </link>
+  <joint name="laser_joint_5" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_frame_5" />
+    <origin xyz="${lidar_wheelbase/2} ${-lidar_track_width/2} ${lidar_height}" rpy="0 0 -${PI/2}"/>
+  </joint>
+
+  <link name="laser_frame_6">
+  </link>
+  <joint name="laser_joint_6" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_frame_6" />
+    <origin xyz="${-lidar_wheelbase/2} ${-lidar_track_width/2} ${lidar_height}" rpy="0 0 -${PI/2}"/>
+  </joint>
+
+  <link name="laser_frame_7">
+  </link>
+  <joint name="laser_joint_7" type="fixed">
+    <parent link="base_link" />
+    <child link="laser_frame_7" />
+    <origin xyz="${-lidar_wheelbase/2} ${lidar_track_width/2} ${lidar_height}" rpy="0 0 ${PI/2}"/>
+  </joint>
+
+    <gazebo reference="laser_frame_0">
+        <sensor type="ray" name="laser_frame_0">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="laser_frame_0" filename="libgazebo_ros_laser.so">
+                <topicName>/cygbot/scan/2d/0</topicName>
+                <frameName>laser_frame_0</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="laser_frame_0">
+      <material>Gazebo/FlatBlack</material>
+      <sensor type="gpu_ray" name="point_frame_0">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>15</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>160</samples>
+              <resolution>1</resolution>
+              <min_angle>${-hori_ang}</min_angle>
+              <max_angle>${hori_ang}</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>60</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-${vert_ang}</min_angle>
+              <max_angle>${vert_ang}</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.05</min>
+            <max>2.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="point_frame_0" filename="libgazebo_ros_velodyne_gpu_laser.so">
+          <topicName>/cygbot/point/3d/0</topicName>
+          <frameName>laser_frame_0</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+        <gazebo reference="laser_frame_1">
+        <sensor type="ray" name="laser_frame_1">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="laser_frame_1" filename="libgazebo_ros_laser.so">
+                <topicName>/cygbot/scan/2d/1</topicName>
+                <frameName>laser_frame_1</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="laser_frame_1">
+      <material>Gazebo/FlatBlack</material>
+      <sensor type="gpu_ray" name="point_frame_1">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>15</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>160</samples>
+              <resolution>1</resolution>
+              <min_angle>${-hori_ang}</min_angle>
+              <max_angle>${hori_ang}</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>60</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-${vert_ang}</min_angle>
+              <max_angle>${vert_ang}</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.05</min>
+            <max>2.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="point_frame_1" filename="libgazebo_ros_velodyne_gpu_laser.so">
+          <topicName>/cygbot/point/3d/1</topicName>
+          <frameName>laser_frame_1</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+        <gazebo reference="laser_frame_2">
+        <sensor type="ray" name="laser_frame_2">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="laser_frame_2" filename="libgazebo_ros_laser.so">
+                <topicName>/cygbot/scan/2d/2</topicName>
+                <frameName>laser_frame_2</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="laser_frame_2">
+      <material>Gazebo/FlatBlack</material>
+      <sensor type="gpu_ray" name="point_frame_2">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>15</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>160</samples>
+              <resolution>1</resolution>
+              <min_angle>${-hori_ang}</min_angle>
+              <max_angle>${hori_ang}</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>60</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-${vert_ang}</min_angle>
+              <max_angle>${vert_ang}</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.05</min>
+            <max>2.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="point_frame_2" filename="libgazebo_ros_velodyne_gpu_laser.so">
+          <topicName>/cygbot/point/3d/2</topicName>
+          <frameName>laser_frame_2</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+        <gazebo reference="laser_frame_3">
+        <sensor type="ray" name="laser_frame_3">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="laser_frame_3" filename="libgazebo_ros_laser.so">
+                <topicName>/cygbot/scan/2d/3</topicName>
+                <frameName>laser_frame_3</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="laser_frame_3">
+      <material>Gazebo/FlatBlack</material>
+      <sensor type="gpu_ray" name="point_frame_3">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>15</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>160</samples>
+              <resolution>1</resolution>
+              <min_angle>${-hori_ang}</min_angle>
+              <max_angle>${hori_ang}</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>60</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-${vert_ang}</min_angle>
+              <max_angle>${vert_ang}</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.05</min>
+            <max>2.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="point_frame_3" filename="libgazebo_ros_velodyne_gpu_laser.so">
+          <topicName>/cygbot/point/3d/3</topicName>
+          <frameName>laser_frame_3</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+        <gazebo reference="laser_frame_4">
+        <sensor type="ray" name="laser_frame_4">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="laser_frame_4" filename="libgazebo_ros_laser.so">
+                <topicName>/cygbot/scan/2d/4</topicName>
+                <frameName>laser_frame_4</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="laser_frame_4">
+      <material>Gazebo/FlatBlack</material>
+      <sensor type="gpu_ray" name="point_frame_4">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>15</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>160</samples>
+              <resolution>1</resolution>
+              <min_angle>${-hori_ang}</min_angle>
+              <max_angle>${hori_ang}</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>60</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-${vert_ang}</min_angle>
+              <max_angle>${vert_ang}</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.05</min>
+            <max>2.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="point_frame_4" filename="libgazebo_ros_velodyne_gpu_laser.so">
+          <topicName>/cygbot/point/3d/4</topicName>
+          <frameName>laser_frame_4</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+        <gazebo reference="laser_frame_5">
+        <sensor type="ray" name="laser_frame_5">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="laser_frame_5" filename="libgazebo_ros_laser.so">
+                <topicName>/cygbot/scan/2d/5</topicName>
+                <frameName>laser_frame_5</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+        <gazebo reference="laser_frame_5">
+      <material>Gazebo/FlatBlack</material>
+      <sensor type="gpu_ray" name="point_frame_5">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>15</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>160</samples>
+              <resolution>1</resolution>
+              <min_angle>${-hori_ang}</min_angle>
+              <max_angle>${hori_ang}</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>60</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-${vert_ang}</min_angle>
+              <max_angle>${vert_ang}</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.05</min>
+            <max>2.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="point_frame_5" filename="libgazebo_ros_velodyne_gpu_laser.so">
+          <topicName>/cygbot/point/3d/5</topicName>
+          <frameName>laser_frame_5</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+        <gazebo reference="laser_frame_6">
+        <sensor type="ray" name="laser_frame_6">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="laser_frame_6" filename="libgazebo_ros_laser.so">
+                <topicName>/cygbot/scan/2d/6</topicName>
+                <frameName>laser_frame_6</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+        <gazebo reference="laser_frame_6">
+      <material>Gazebo/FlatBlack</material>
+      <sensor type="gpu_ray" name="point_frame_6">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>15</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>160</samples>
+              <resolution>1</resolution>
+              <min_angle>${-hori_ang}</min_angle>
+              <max_angle>${hori_ang}</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>60</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-${vert_ang}</min_angle>
+              <max_angle>${vert_ang}</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.05</min>
+            <max>2.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="point_frame_6" filename="libgazebo_ros_velodyne_gpu_laser.so">
+          <topicName>/cygbot/point/3d/6</topicName>
+          <frameName>laser_frame_6</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+        <gazebo reference="laser_frame_7">
+        <sensor type="ray" name="laser_frame_7">
+            <pose>0 0 0 0 0 0</pose>
+            <visualize>true</visualize>
+            <update_rate>15</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>160</samples>
+                        <resolution>1</resolution>
+                        <min_angle>${-hori_ang}</min_angle>
+                        <max_angle>${hori_ang}</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.20</min>
+                    <max>8.0</max>
+                    <resolution>0.01</resolution>
+                </range>
+            </ray>
+            <plugin name="laser_frame_7" filename="libgazebo_ros_laser.so">
+                <topicName>/cygbot/scan/2d/7</topicName>
+                <frameName>laser_frame_7</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
+
+      <gazebo reference="laser_frame_7">
+      <material>Gazebo/FlatBlack</material>
+      <sensor type="gpu_ray" name="point_frame_7">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>15</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>160</samples>
+              <resolution>1</resolution>
+              <min_angle>${-hori_ang}</min_angle>
+              <max_angle>${hori_ang}</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>60</samples>
+              <resolution>1.0</resolution>
+              <min_angle>-${vert_ang}</min_angle>
+              <max_angle>${vert_ang}</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.05</min>
+            <max>2.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="point_frame_7" filename="libgazebo_ros_velodyne_gpu_laser.so">
+          <topicName>/cygbot/point/3d/7</topicName>
+          <frameName>laser_frame_7</frameName>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+</robot>

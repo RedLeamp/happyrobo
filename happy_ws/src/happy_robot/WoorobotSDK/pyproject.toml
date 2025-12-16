@@ -1,0 +1,15 @@
+[build-system]
+requires = ["scikit-build-core[pyproject]", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "woorobot_sdk"
+version = "0.1.0"
+description = "Python binding (C++ SDK)"
+authors = [{ name = "Woorobot" }]
+requires-python = ">=3.6"
+
+[tool.scikit-build]
+minimum-version = "0.3"
+build-dir = "build"
+wheel.packages = ["woorobot_sdk_python"]

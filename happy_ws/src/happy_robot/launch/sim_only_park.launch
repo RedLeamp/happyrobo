@@ -1,0 +1,77 @@
+<launch>
+
+  <arg name="world_name" default="$(find happy_robo)/worlds/only_park.world" />
+  <!-- Gazebo 실행 -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+    <arg name="world_name" value="$(arg world_name)" />
+  </include>
+
+  <!-- 로봇 URDF 로드 -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find happy_robo)/urdf/swerve_drive_robot.urdf.xacro"/>
+
+  <!-- 로봇을 Gazebo에 스폰 -->
+  <!-- <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model swerve_drive_robot -x 0.0 -y 0.0 -z 2.1 -param robot_description"/> -->
+
+  <!-- 컨트롤러 매니저 시작 -->
+  <rosparam file="$(find happy_robo)/config/controllers.yaml" command="load" />
+
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find happy_robo)/launch/include/only_obb.rviz" />
+   <!-- <rosparam file="$(find happy_robo)/config/sim_pid_gains.yaml"
+            command="load"
+            ns="/swerve_drive_robot/gazebo_ros_control/pid_gains"/> -->
+
+<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+  <include file="$(find happy_robo)/launch/include/gmapping_real.launch" />
+  <include file="$(find happy_robo)/launch/include/move_base_real.launch" >
+    <arg name="move_forward_only" value="false"/>
+  </include>
+  <include file="$(find happy_robo)/control/launch/control.launch" />
+
+<node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter_madgwick">
+    <param name="use_mag" value="false" /> <!-- MPU9250의 자력계 사용 여부 -->
+    <param name="publish_tf" value="false" /> <!-- TF 직접 퍼블리시 비활성화 -->
+    <param name="world_frame" value="enu" /> <!-- 좌표계 설정 -->
+    <param name="gain" value="0.05" />    <!-- MPU9250 노이즈 고려 -->
+    <param name="zeta" value="0.001" />   <!-- 드리프트 보정 -->
+    <!-- <remap from="imu/data" to="/swerve_drive_robot/imu/data" /> -->
+  </node>
+
+
+<!-- 2. 개별 컨트롤러들 이름을 명시해서 로드 -->
+<node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+      output="screen" ns="/swerve_drive_robot"
+      args="
+      joint_state_controller 
+      front_left_wheel_joint_controller 
+      front_right_wheel_joint_controller 
+      rear_left_wheel_joint_controller 
+      rear_right_wheel_joint_controller 
+      front_left_steering_joint_controller 
+      front_right_steering_joint_controller 
+      rear_left_steering_joint_controller 
+      rear_right_steering_joint_controller" />
+  
+
+  <!-- <rosparam ns="/swerve_drive_robot/gazebo_ros_control/pid_gains">
+    front_left_steering_joint: {p: 50.0, i: 0.0, d: 5.0}
+    front_left_wheel_joint: {p: 50.0, i: 0.0, d: 5.0}
+    front_right_steering_joint: {p: 50.0, i: 0.0, d: 5.0}
+    front_right_wheel_joint: {p: 50.0, i: 0.0, d: 5.0}
+    rear_left_steering_joint: {p: 50.0, i: 0.0, d: 5.0}
+    rear_left_wheel_joint: {p: 50.0, i: 0.0, d: 5.0}
+    rear_right_steering_joint: {p: 50.0, i: 0.0, d: 5.0}
+    rear_right_wheel_joint: {p: 50.0, i: 0.0, d: 5.0}
+  </rosparam> -->
+
+  <node pkg="happy_robo" type="sim_vel_converter"    name="sim_vel_converter" output="screen"/>
+  <!-- <node pkg="happy_robo" type="sim_odom"    name="sim_odom" output="screen"/> -->
+  <node pkg="happy_robo" type="async_scan_merger_real_2d" name="async_scan_merger_real_2d"/>
+  <node pkg="happy_robo" type="dynamic_map_publisher"    name="dynamic_map_publisher"    output="screen"/>
+
+</launch>

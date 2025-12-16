@@ -1,8 +1,0 @@
-prefix=/home/happy/happy_ws/install
-
-Name: happy_robo
-Description: Description of happy_robo
-Version: 1.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: 

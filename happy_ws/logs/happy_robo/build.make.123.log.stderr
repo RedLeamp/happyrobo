@@ -1,7 +1,0 @@
-[01m[K/home/happy/happy_ws/src/happy_robot/src/motor_controller.cpp:[m[K In member function ‘[01m[Kfloat MotorController::getRPM(int)[m[K’:
-[01m[K/home/happy/happy_ws/src/happy_robot/src/motor_controller.cpp:68:87:[m[K [01;31m[Kerror: [m[Kconversion from ‘[01m[Kvoid[m[K’ to non-scalar type ‘[01m[Kstd::vector<unsigned char>[m[K’ requested
-   68 |     std::vector<uint8_t> response = [01;31m[Kconnector.getController(id).requestWithoutResponse(request, "Get velocity now")[m[K;
-      |                                     [01;31m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
-make[2]: *** [CMakeFiles/motor_controller_lib.dir/build.make:63: CMakeFiles/motor_controller_lib.dir/src/motor_controller.cpp.o] Error 1
-make[1]: *** [CMakeFiles/Makefile2:860: CMakeFiles/motor_controller_lib.dir/all] Error 2
-make: *** [Makefile:141: all] Error 2

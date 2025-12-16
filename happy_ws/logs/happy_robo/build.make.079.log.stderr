@@ -1,8 +1,0 @@
-In file included from [01m[K/home/happy/happy_ws/src/happy_robot/src/vel_converter_sdk.cpp:24[m[K:
-[01m[K/home/happy/happy_ws/src/happy_robot/include/motor_controller.h:2:10:[m[K [01;31m[Kfatal error: [m[KSerialPortConnector.h: No such file or directory
-    2 | #include [01;31m[K<SerialPortConnector.h>[m[K
-      |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~[m[K
-compilation terminated.
-make[2]: *** [CMakeFiles/vel_converter_sdk.dir/build.make:63: CMakeFiles/vel_converter_sdk.dir/src/vel_converter_sdk.cpp.o] Error 1
-make[1]: *** [CMakeFiles/Makefile2:368: CMakeFiles/vel_converter_sdk.dir/all] Error 2
-make: *** [Makefile:141: all] Error 2

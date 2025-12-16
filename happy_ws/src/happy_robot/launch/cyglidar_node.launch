@@ -1,0 +1,52 @@
+<launch>
+  <arg name="run_mode" value="0" doc="version type [0(2D), 1(3D), 2(2D/3D)]"/>
+  <!-- <include file="$(find cyglidar_d2_ros1)/launch/cyglidar.launch"> -->
+    <!-- <arg name="number" value="0" /> -->
+    <!-- <arg name="port" value="0" /> -->
+    <!-- <arg name="run_mode" value="$(arg run_mode)"/> -->
+    <!-- <arg name="laser_tf" default="0.23 0.17 0.34 0 0 0 map laser_frame_0 15" /> -->
+  <!-- </include> -->
+  <include file="$(find cyglidar_d2_ros1)/launch/cyglidar.launch">
+    <arg name="number" value="1" />
+    <arg name="port" value="1" />
+    <arg name="run_mode" value="$(arg run_mode)"/>
+    <!-- <arg name="laser_tf" default="0.23 0.17 0.34 0 0 0 map laser_frame_0 15" /> -->
+  </include>
+  <include file="$(find cyglidar_d2_ros1)/launch/cyglidar.launch">
+    <arg name="number" value="2"/>
+    <arg name="port" value="2" />
+    <arg name="run_mode" value="$(arg run_mode)"/>
+    <!-- <arg name="laser_tf" default="0.23 -0.17 0.34 0 0 0 map laser_frame_1 15" /> -->
+  </include>
+  <include file="$(find cyglidar_d2_ros1)/launch/cyglidar.launch">
+    <arg name="number" value="3" />
+    <arg name="port" value="3" />
+    <arg name="run_mode" value="$(arg run_mode)"/>
+    <!-- <arg name="laser_tf" default="-0.23 0.17 0.34 3.14159 0 0 map laser_frame_2 15" /> -->
+  </include>
+  <include file="$(find cyglidar_d2_ros1)/launch/cyglidar.launch">
+    <arg name="number" value="4" />
+    <arg name="port" value="4" />
+    <arg name="run_mode" value="$(arg run_mode)"/>
+    <!-- <arg name="laser_tf" default="-0.23 -0.17 0.34 3.14159 0 0 map laser_frame_3 15" /> -->
+  </include>
+  <include file="$(find cyglidar_d2_ros1)/launch/cyglidar.launch">
+    <arg name="number" value="5" />
+    <arg name="port" value="5" />
+    <arg name="run_mode" value="$(arg run_mode)"/>
+    <!-- <arg name="laser_tf" default="-0.23 -0.17 0.34 3.14159 0 0 map laser_frame_3 15" /> -->
+  </include>
+  <include file="$(find cyglidar_d2_ros1)/launch/cyglidar.launch">
+    <arg name="number" value="6" />
+    <arg name="port" value="6" />
+    <arg name="run_mode" value="$(arg run_mode)"/>
+    <!-- <arg name="laser_tf" default="-0.23 -0.17 0.34 3.14159 0 0 map laser_frame_3 15" /> -->
+  </include>
+  <include file="$(find cyglidar_d2_ros1)/launch/cyglidar.launch">
+    <arg name="number" value="7" />
+    <arg name="port" value="7" />
+    <arg name="run_mode" value="$(arg run_mode)"/>
+    <!-- <arg name="laser_tf" default="-0.23 -0.17 0.34 3.14159 0 0 map laser_frame_3 15" /> -->
+  </include>
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cyglidar_d2_ros1)/rviz/cyglidar_config.rviz"/> -->
+</launch>

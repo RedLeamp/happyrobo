@@ -1,0 +1,24 @@
+<launch>
+
+  <arg name="world_name" default="$(find happy_robo)/worlds/new.world" />
+  <!-- Gazebo 실행 -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+    <arg name="world_name" value="$(arg world_name)" />
+  </include>
+
+  <param name="robot_description" command="$(find xacro)/xacro $(find happy_robo)/urdf/swerve_drive_robot.urdf.xacro"/>
+
+<node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter_madgwick">
+    <param name="use_mag" value="false" /> <!-- MPU9250의 자력계 사용 여부 -->
+    <param name="publish_tf" value="false" /> <!-- TF 직접 퍼블리시 비활성화 -->
+    <param name="world_frame" value="enu" /> <!-- 좌표계 설정 -->
+    <param name="gain" value="0.05" />    <!-- MPU9250 노이즈 고려 -->
+    <param name="zeta" value="0.001" />   <!-- 드리프트 보정 -->
+  </node>
+
+</launch>

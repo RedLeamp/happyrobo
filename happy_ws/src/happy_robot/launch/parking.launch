@@ -1,0 +1,95 @@
+<launch>
+  <arg name="use_sim_time" default="true" />
+  <arg name="gui" default="true" />
+  <arg name="headless" default="false" />
+  <arg name="world_name" default="$(find happy_robo)/worlds/250206.world" />
+  <!-- <arg name="world_name" default="$(find happy_robo)/worlds/parking_demo_landing.world" /> -->
+  <!-- <arg name="world_name" default="$(find happy_robo)/worlds/parking_demo3.world" /> -->
+  <!-- <arg name="world_name" default="$(find happy_robo)/worlds/obb5.world" /> -->
+  <arg name="move_forward_only" default="false"/>
+  <!-- <arg name="map_file" default="$(find happy_robo)/maps/map_new.yaml"/> -->
+  <arg name="use_map_topic" default="false"/>
+  <!-- <arg name="scan_topic" default="front/scan" /> -->
+
+  <!-- Short-term hack to support the original front_laser:=true argument for spawning
+       the simulator. This will be removed in favour of using the config:=x arg instead. -->
+  <arg name="front_laser" default="true" />
+  <arg name="default_config" value="front_laser" if="$(arg front_laser)" />
+  <arg name="default_config" value="base" unless="$(arg front_laser)" />
+  <!-- end of hack -->
+
+  <!-- Configuration of Jackal which you would like to simulate.
+       See jackal_description for details. -->
+  <arg name="config" default="$(arg default_config)" />
+
+  <!-- Launch Gazebo with the specified world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="0" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="use_sim_time" value="$(arg use_sim_time)" />
+    <arg name="headless" value="$(arg headless)" />
+    <arg name="world_name" value="$(arg world_name)" />
+  </include>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+    <!-- Load Jackal's description-->
+  <param name="robot_description" command="$(find jackal_description)/scripts/env_run
+                    $(find jackal_description)/urdf/configs/$(arg config)
+                    $(find xacro)/xacro $(find happy_robo)/urdf/happy_robo.urdf.xacro --inorder" />
+
+  <!-- Control -->
+  <include file="$(find jackal_control)/launch/control.launch" />
+  <include file="$(find jackal_control)/launch/teleop.launch">
+    <arg name="joystick" value="false"/>
+  </include>
+
+  <!-- <rosparam file="$(find happy_robo)/config/pid_gains.yaml" command="load" />
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+        args="joint_state_controller front_left_wheel_controller front_right_wheel_controller rear_left_wheel_controller rear_right_wheel_controller" /> -->
+
+  <!-- Spawn Jackal -->
+  <!-- <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+              args="-urdf -model jackal -param robot_description -x 0 -y 0 -z 1.0" /> -->
+
+  <!-- Rviz -->
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find happy_robo)/launch/include/obb.rviz" />
+    <!-- Rviz -->
+  <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find happy_robo)/launch/include/gmapping.rviz" /> -->
+
+  <!-- run nodes -->
+  <!-- <node pkg="happy_robo" type="master_node.py" name="master_node" output="screen"/> -->
+  <!-- <node pkg="happy_robo" type="tf_publisher"    name="tf_publisher"    output="screen"/> -->
+  <node pkg="happy_robo" type="dynamic_map_publisher"    name="dynamic_map_publisher"    output="screen"/>
+  <!-- <node pkg="happy_robo" type="vel_converter"    name="vel_converter"    output="screen"/> -->
+  <!-- <node pkg="happy_robo" type="mode_converter.py" name="mode_converter" output="screen"/> -->
+  <!-- <node pkg="happy_robo" type="async_scan_merger" name="async_scan_merger"/> -->
+
+  <!-- <node pkg="happy_robo" name="merger" type="merger" output ="screen">
+    <remap from="/combined_points" to="/points_raw"/>
+  </node> -->
+
+    <!--- Run gmapping -->
+  <include file="$(find happy_robo)/launch/include/gmapping.launch" />
+
+
+  <!-- Map server -->
+  <!-- <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/> -->
+
+    <!-- move_base -->
+  <include file="$(find happy_robo)/launch/include/move_base.launch" >
+    <arg name="move_forward_only" value="$(arg move_forward_only)"/>
+  </include>
+
+
+  <!--- Run AMCL -->
+    <!-- <include file="$(find happy_robo)/launch/include/amcl.launch">
+    <arg name="use_map_topic" value="$(arg use_map_topic)" />
+    <arg name="scan_topic"    value="$(arg scan_topic)" />
+  </include> -->
+
+    <!-- <node pkg="tf" type="static_transform_publisher" name="link0" args=" 0.000   0.000 0.000 0.000 0.00 0.00 base_link laser 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link1" args=" 0.250  -0.267 0.000 0.000 0.00 0.00 base_link sensor_1 100" />
+  <node pkg="tf" type="static_transform_publisher" name="link2" args="-0.250   0.267 0.000 0.000 0.00 0.00 base_link sensor_2 100" /> -->
+  
+</launch>

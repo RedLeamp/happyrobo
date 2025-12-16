@@ -1,0 +1,74 @@
+#Configuation for robot odometry EKF
+#
+frequency: 50
+two_d_mode: true
+
+odom0: /odom/raw
+odom0_config: [true,  true,  false,   # x, y, z 위치
+               false, false, true,    # roll, pitch, yaw
+               true,  true,  false,   # x, y, z 속도
+               false, false, true,    # roll, pitch, yaw 속도
+               false, false, false]   # x, y, z 가속도
+# odom0_config: [false, false, false,
+#                false, false,true,
+#                false, false, false,
+#                false, false, true,
+#                false, false, false]
+odom0_differential: false
+
+imu0: /wit/imu
+imu0_config: [false, false, false,   # x, y, z 위치
+              false, false, false,   # roll, pitch, yaw (2D 모드에서 필요 없음)
+              false, false, false,   # x, y, z 속도
+              false, false, true,    # roll, pitch, yaw 속도
+              false, false, false]   # x, y, z 가속도
+# imu0_config: [false, false, false,
+#               true, true, false,
+#               false, false, false,
+#               false, false, true,
+#               false, false, false]
+
+# X, Y, Z: 로봇의 (x, y, z)좌표
+# roll, pitch, yaw: 로봇의 방향을 나타내기 위한 roll, pitch, yaw값
+# X/dt, Y/dt, Z/dt: 로봇의 x, y, z 방향 선속도
+# roll/dt, pitch/dt, yaw/dt: 로봇의 roll, pitch, yaw 방향 각속도
+# X/dt2, Y/dt2, Z/dt2: 로봇의 x, y, z 방향 선 가속도
+imu0_differential: false
+imu0_queue_size: 10
+imu0_remove_gravitational_acceleration: false # 중력 가속도 제거
+
+# odom0_config: [true, true, false,
+#                false, false, true,
+#                false, false, false,
+#                false, false, false,
+#                false, false, false]
+# imu0_config: [false, false, false,
+#               false, false, false,
+#               false, false, false,
+#               false, false, true,
+#               false, false, false]
+
+publish_tf: true
+odom_frame: odom
+base_link_frame: base_link
+world_frame: odom
+
+initial_estimate_covariance: [
+    1e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # x (0.01 m^2)
+    0.0, 1e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # y (0.01 m^2)
+    0.0, 0.0, 1e-9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # z (작게, 2D)
+    0.0, 0.0, 0.0, 1e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # roll (0.01 rad^2)
+    0.0, 0.0, 0.0, 0.0, 1e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # pitch (0.01 rad^2)
+    0.0, 0.0, 0.0, 0.0, 0.0, 1e-2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # yaw (0.01 rad^2)
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # vx (0.0001 m^2/s^2)
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # vy (0.0001 m^2/s^2)
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,  # vz (작게, 2D)
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3e-8, 0.0, 0.0, 0.0, 0.0, 0.0,  # vroll (3e-8 rad^2/s^2)
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3e-8, 0.0, 0.0, 0.0, 0.0,  # vpitch (3e-8 rad^2/s^2)
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3e-8, 0.0, 0.0, 0.0,  # vyaw (3e-8 rad^2/s^2)
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8e-6, 0.0, 0.0,  # ax (8e-6 m^2/s^4)
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 8e-6, 0.0,  # ay (8e-6 m^2/s^4)
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-9   # az (작게, 2D)
+  ]
+
+# predict_to_current_time: true
