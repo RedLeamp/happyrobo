@@ -1,0 +1,19 @@
+﻿################################################################################
+# 이 .gitignore 파일은 Microsoft(R) Visual Studio에서 자동으로 만들어졌습니다.
+################################################################################
+
+/.vs/happyrobo_/FileContentIndex/1f1ea965-4a63-45dc-8f7c-09c7d044c5cf.vsidx
+/.vs/happyrobo_/FileContentIndex/207150f7-c1f9-46ce-8b46-1e58d667fdc8.vsidx
+/.vs/happyrobo_/FileContentIndex/28703a4b-0b84-44ff-af6b-799d320ac085.vsidx
+/.vs/happyrobo_/FileContentIndex/2870e6a6-4cc3-4f91-bf11-d9a28daa9ec1.vsidx
+/.vs/happyrobo_/FileContentIndex/6409c8de-33dc-438b-becf-288b6d8191a8.vsidx
+/.vs/happyrobo_/FileContentIndex/8325b423-daf4-40dd-a2e7-0fb3d44fbd27.vsidx
+/.vs/happyrobo_/FileContentIndex/ba03837a-291b-412e-89fe-86d4e1a105fa.vsidx
+/.vs/happyrobo_/FileContentIndex/bffcef71-0b9c-42ef-a1f3-e4eea687d9f3.vsidx
+/.vs/happyrobo_/FileContentIndex/c1ea6fdf-0ca3-47f5-8ea9-aa29b475c04b.vsidx
+/.vs/happyrobo_/FileContentIndex/cae11c1b-8167-4aa4-9efd-0f9fdbc4a29e.vsidx
+/.vs/happyrobo_/FileContentIndex/f712e878-3ee1-4cbe-8fb5-a422be1a9475.vsidx
+/.vs/happyrobo_/FileContentIndex/c23b48f0-5bc8-48e1-a13f-dfef6cfb08ea.vsidx
+/.vs/happyrobo_/v17/Browse.VC.db
+/.vs
+/dependencies/pcl-pcl-1.10.0/.ci
