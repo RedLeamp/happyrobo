@@ -17,3 +17,6 @@
 /.vs/happyrobo_/v17/Browse.VC.db
 /.vs
 /dependencies/pcl-pcl-1.10.0/.ci
+/dependencies/pcl-pcl-1.10.0/.dev
+/dependencies/pcl-pcl-1.10.0/.github
+*.clang-format
