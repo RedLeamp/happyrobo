@@ -1,0 +1,6 @@
+[31m[1mCMake Error[0m at /home/happy/happy_ws/src/happy_robot/CMakeLists.txt:30:
+  Parse error.  Expected a command name, got unquoted argument with text
+  "//".
+
+
+make: *** [Makefile:2258: cmake_check_build_system] Error 1

@@ -1,0 +1,36 @@
+[35m[1mScanning dependencies of target woorobot_sdk[0m
+[  2%] [32mBuilding CXX object WoorobotSDK/CMakeFiles/woorobot_sdk.dir/woorobot_sdk_cpp/MotorControl.cpp.o[0m
+[  6%] Built target dynamic_map_publisher
+[ 11%] Built target imu_receiver
+[ 20%] Built target async_scan_merger_real_2d
+[ 20%] Built target conversion
+[ 20%] Built target std_msgs_generate_messages_cpp
+[ 20%] Built target geometry_msgs_generate_messages_cpp
+[ 20%] Built target geometry_msgs_generate_messages_lisp
+[ 20%] Built target _happy_robo_generate_messages_check_deps_AlignAndGoalPoseStamped
+[ 20%] Built target std_msgs_generate_messages_lisp
+[ 20%] Built target geometry_msgs_generate_messages_eus
+[ 20%] Built target std_msgs_generate_messages_eus
+[ 20%] Built target geometry_msgs_generate_messages_nodejs
+[ 20%] Built target _happy_robo_generate_messages_check_deps_TriggerWithCommand
+[ 20%] Built target std_msgs_generate_messages_nodejs
+[ 20%] Built target std_msgs_generate_messages_py
+[ 20%] Built target geometry_msgs_generate_messages_py
+[ 28%] Built target happy_robo_generate_messages_cpp
+[ 28%] Built target odom_publisher
+[ 33%] Built target happy_robo_generate_messages_lisp
+[ 37%] Built target filter_pcd
+[ 44%] Built target happy_robo_generate_messages_eus
+[ 55%] Built target happy_robo_generate_messages_py
+[ 57%] Built target happy_robo_generate_messages_nodejs
+[ 57%] Built target happy_robo_generate_messages
+[ 60%] [32m[1mLinking CXX shared library libwoorobot_sdk.so[0m
+[ 82%] Built target woorobot_sdk
+[ 86%] [32m[1mLinking CXX executable woorobot_config[0m
+[ 86%] [32m[1mLinking CXX executable woorobot_example[0m
+[ 88%] [32m[1mLinking CXX shared library /home/happy/happy_ws/devel/.private/happy_robo/lib/libmotor_controller_lib.so[0m
+[ 91%] Built target woorobot_example
+[ 93%] Built target woorobot_config
+[ 95%] Built target motor_controller_lib
+[ 97%] [32m[1mLinking CXX executable /home/happy/happy_ws/devel/.private/happy_robo/lib/happy_robo/vel_converter_sdk[0m
+[100%] Built target vel_converter_sdk

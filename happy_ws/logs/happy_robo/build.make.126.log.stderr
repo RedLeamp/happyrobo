@@ -1,0 +1,7 @@
+[01m[K/home/happy/happy_ws/src/happy_robot/WoorobotSDK/woorobot_sdk_cpp/MotorControl.cpp:[m[K In member function ‘[01m[Kvoid MotorControl::setDecTime(uint16_t)[m[K’:
+[01m[K/home/happy/happy_ws/src/happy_robot/WoorobotSDK/woorobot_sdk_cpp/MotorControl.cpp:33:25:[m[K [01;31m[Kerror: [m[K‘[01m[KrequestWithoutResponse[m[K’ was not declared in this scope
+   33 |     controller->request([01;31m[KrequestWithoutResponse[m[K, "Set dec time " + std::to_string(value));
+      |                         [01;31m[K^~~~~~~~~~~~~~~~~~~~~~[m[K
+make[2]: *** [WoorobotSDK/CMakeFiles/woorobot_sdk.dir/build.make:128: WoorobotSDK/CMakeFiles/woorobot_sdk.dir/woorobot_sdk_cpp/MotorControl.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:3600: WoorobotSDK/CMakeFiles/woorobot_sdk.dir/all] Error 2
+make: *** [Makefile:141: all] Error 2

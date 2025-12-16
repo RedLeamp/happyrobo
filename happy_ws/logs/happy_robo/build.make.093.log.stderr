@@ -1,0 +1,41 @@
+[01m[K/home/happy/happy_ws/src/happy_robot/WoorobotSDK/woorobot_sdk_cpp/Controller.cpp:[m[K In member function ‘[01m[Kstd::vector<unsigned char> Controller::request(std::vector<unsigned char>, std::string)[m[K’:
+[01m[K/home/happy/happy_ws/src/happy_robot/WoorobotSDK/woorobot_sdk_cpp/Controller.cpp:242:10:[m[K [01;35m[Kwarning: [m[Kignoring return value of ‘[01m[Kssize_t write(int, const void*, size_t)[m[K’, declared with attribute warn_unused_result [[01;35m[K-Wunused-result[m[K]
+  242 |     [01;35m[Kwrite(*connector->fd, request_crc.data(), request_crc.size())[m[K;
+      |     [01;35m[K~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K/home/happy/happy_ws/src/happy_robot/WoorobotSDK/woorobot_sdk_cpp/Controller.cpp:[m[K In member function ‘[01m[Kvoid Controller::requestAll(std::vector<unsigned char>)[m[K’:
+[01m[K/home/happy/happy_ws/src/happy_robot/WoorobotSDK/woorobot_sdk_cpp/Controller.cpp:414:10:[m[K [01;35m[Kwarning: [m[Kignoring return value of ‘[01m[Kssize_t write(int, const void*, size_t)[m[K’, declared with attribute warn_unused_result [[01;35m[K-Wunused-result[m[K]
+  414 |     [01;35m[Kwrite(*connector->fd, requests.data(), requests.size())[m[K;
+      |     [01;35m[K~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K/home/happy/happy_ws/src/happy_robot/WoorobotSDK/woorobot_sdk_cpp/Firmware.cpp:[m[K In member function ‘[01m[Kstd::vector<unsigned char> Firmware::requestBootLoader(std::vector<unsigned char>)[m[K’:
+[01m[K/home/happy/happy_ws/src/happy_robot/WoorobotSDK/woorobot_sdk_cpp/Firmware.cpp:209:10:[m[K [01;35m[Kwarning: [m[Kignoring return value of ‘[01m[Kssize_t write(int, const void*, size_t)[m[K’, declared with attribute warn_unused_result [[01;35m[K-Wunused-result[m[K]
+  209 |     [01;35m[Kwrite(*connector->fd, request_crc.data(), request_crc.size())[m[K;
+      |     [01;35m[K~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+In file included from [01m[K/opt/ros/noetic/include/ros/ros.h:40[m[K,
+                 from [01m[K/home/happy/happy_ws/src/happy_robot/src/vel_converter_sdk.cpp:1[m[K:
+[01m[K/home/happy/happy_ws/src/happy_robot/src/vel_converter_sdk.cpp:[m[K In member function ‘[01m[Kvoid VelConverter::stopModeCallback(const ConstPtr&)[m[K’:
+[01m[K/home/happy/happy_ws/src/happy_robot/src/vel_converter_sdk.cpp:514:22:[m[K [01;35m[Kwarning: [m[Kformat ‘[01m[K%s[m[K’ expects argument of type ‘[01m[Kchar*[m[K’, but argument 8 has type ‘[01m[Kint[m[K’ [[01;35m[K-Wformat=[m[K]
+  514 |             ROS_INFO([01;35m[K"Got Stop Mode MSG : %s"[m[K, [32m[Kmsg->data[m[K);
+      |                      [01;35m[K^~~~~~~~~~~~~~~~~~~~~~~~[m[K  [32m[K~~~~~~~~~[m[K
+      |                                                     [32m[K|[m[K
+      |                                                     [32m[Kint[m[K
+[01m[K/opt/ros/noetic/include/ros/console.h:351:165:[m[K [01;36m[Knote: [m[Kin definition of macro ‘[01m[KROSCONSOLE_PRINT_AT_LOCATION_WITH_FILTER[m[K’
+  351 |     ::ros::console::print(filter, __rosconsole_define_location__loc.logger_, __rosconsole_define_location__loc.level_, __FILE__, __LINE__, __ROSCONSOLE_FUNCTION__, [01;36m[K__VA_ARGS__[m[K)
+      |                                                                                                                                                                     [01;36m[K^~~~~~~~~~~[m[K
+[01m[K/opt/ros/noetic/include/ros/console.h:390:7:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROSCONSOLE_PRINT_AT_LOCATION[m[K’
+  390 |       [01;36m[KROSCONSOLE_PRINT_AT_LOCATION[m[K(__VA_ARGS__); \
+      |       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K/opt/ros/noetic/include/ros/console.h:575:35:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROS_LOG_COND[m[K’
+  575 | #define ROS_LOG(level, name, ...) [01;36m[KROS_LOG_COND[m[K(true, level, name, __VA_ARGS__)
+      |                                   [01;36m[K^~~~~~~~~~~~[m[K
+[01m[K/opt/ros/noetic/include/rosconsole/macros_generated.h:110:23:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROS_LOG[m[K’
+  110 | #define ROS_INFO(...) [01;36m[KROS_LOG[m[K(::ros::console::levels::Info, ROSCONSOLE_DEFAULT_NAME, __VA_ARGS__)
+      |                       [01;36m[K^~~~~~~[m[K
+[01m[K/home/happy/happy_ws/src/happy_robot/src/vel_converter_sdk.cpp:514:13:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROS_INFO[m[K’
+  514 |             [01;36m[KROS_INFO[m[K("Got Stop Mode MSG : %s", msg->data);
+      |             [01;36m[K^~~~~~~~[m[K
+[01m[K/home/happy/happy_ws/src/happy_robot/src/vel_converter_sdk.cpp:514:44:[m[K [01;36m[Knote: [m[Kformat string is defined here
+  514 |             ROS_INFO("Got Stop Mode MSG : [01;36m[K%s[m[K", msg->data);
+      |                                           [01;36m[K~^[m[K
+      |                                            [01;36m[K|[m[K
+      |                                            [01;36m[Kchar*[m[K
+      |                                           [32m[K%d[m[K

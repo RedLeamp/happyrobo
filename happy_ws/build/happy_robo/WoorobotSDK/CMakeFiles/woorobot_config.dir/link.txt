@@ -1,0 +1,1 @@
+/usr/bin/c++   -std=c++14 -O3 -O3 -DNDEBUG   CMakeFiles/woorobot_config.dir/example/cpp/config.cpp.o  -o woorobot_config  -Wl,-rpath,/home/happy/happy_ws/build/happy_robo/WoorobotSDK libwoorobot_sdk.so 

@@ -1,0 +1,45 @@
+Not searching for unused variables given on the command line.
+[36m--[0m Found Boost: /usr/lib/aarch64-linux-gnu/cmake/Boost-1.71.0/BoostConfig.cmake (found version "1.71.0") found components: system iostreams
+[36m--[0m Eigen found (include: /usr/include/eigen3, version: 3.3.7)
+[36m--[0m Found Boost: /usr/include (found suitable version "1.71.0", minimum required is "1.55.0") found components: system filesystem date_time iostreams regex
+[36m--[0m looking for PCL_COMMON
+[36m--[0m Found installed version of Eigen: /usr/lib/cmake/eigen3
+[36m--[0m Found required Ceres dependency: Eigen version 3.3.7 in /usr/include/eigen3
+[36m--[0m Found required Ceres dependency: glog
+[36m--[0m Found installed version of gflags: /usr/lib/aarch64-linux-gnu/cmake/gflags
+[36m--[0m Detected gflags version: 2.2.2
+[36m--[0m Found required Ceres dependency: gflags
+[36m--[0m Found Ceres version: 1.14.0 installed in: /usr with components: [EigenSparse, SparseLinearAlgebraLibrary, LAPACK, SuiteSparse, CXSparse, SchurSpecializations, OpenMP, Multithreading]
+[36m--[0m Build type: Release
+[33m[1mCMake Warning[0m at /usr/src/googletest/googlemock/CMakeLists.txt:43 (project):
+  VERSION keyword not followed by a value or was followed by a value that
+  expanded to nothing.
+
+
+[33m[1mCMake Warning[0m at /usr/src/googletest/googletest/CMakeLists.txt:54 (project):
+  VERSION keyword not followed by a value or was followed by a value that
+  expanded to nothing.
+
+
+[36m--[0m Found PythonInterp: /usr/bin/python3 (found version "3.8.10")
+[36m--[0m Using CATKIN_DEVEL_PREFIX: /home/happy/happy_ws/devel/.private/cartographer_ros
+[36m--[0m Using CMAKE_PREFIX_PATH: /home/happy/happy_ws/devel;/opt/ros/noetic
+[36m--[0m This workspace overlays: /home/happy/happy_ws/devel;/opt/ros/noetic
+[36m--[0m Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3")
+[36m--[0m Using PYTHON_EXECUTABLE: /usr/bin/python3
+[36m--[0m Using Debian Python package layout
+[36m--[0m Found PY_em: /usr/lib/python3/dist-packages/em.py
+[36m--[0m Using empy: /usr/lib/python3/dist-packages/em.py
+[36m--[0m Using CATKIN_ENABLE_TESTING: ON
+[36m--[0m Call enable_testing()
+[36m--[0m Using CATKIN_TEST_RESULTS_DIR: /home/happy/happy_ws/build/cartographer_ros/test_results
+[36m--[0m Found gmock: gmock and gtests will be built
+[36m--[0m Using Python nosetests: /usr/bin/nosetests3
+[36m--[0m catkin 0.8.10
+[36m--[0m BUILD_SHARED_LIBS is on
+[36m--[0m Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+[36m--[0m Found PkgConfig: /usr/bin/pkg-config (found version "0.29.1")
+[36m--[0m Found Lua: /usr/lib/aarch64-linux-gnu/liblua5.2.so;/usr/lib/aarch64-linux-gnu/libm.so (found version "5.2.4")
+[36m--[0m Configuring done
+[36m--[0m Generating done
+[36m--[0m Build files have been written to: /home/happy/happy_ws/build/cartographer_ros

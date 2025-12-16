@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<package>
+  <name>happy_robo</name>
+  <version>1.0.0</version>
+  <description>happy-robo-autonomous-driving-project</description>
+
+  <maintainer email="ros@ros.com">Chulyong Lee</maintainer>
+
+  <license>TODO</license>
+
+  <author >Chulyong Lee</author>
+
+  <buildtool_depend>controller_manager</buildtool_depend>
+  <buildtool_depend>diff_drive_controller</buildtool_depend>
+  <buildtool_depend>robot_state_publisher</buildtool_depend>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>cartographer_ros</build_depend>
+  <run_depend>cartographer_ros</run_depend>
+  
+  <build_depend>cartographer_ros_msgs</build_depend>
+  <run_depend>cartographer_ros_msgs</run_depend>
+
+  <build_depend>roscpp</build_depend>
+  <run_depend>roscpp</run_depend>
+
+  <build_depend>rospy</build_depend>
+  <run_depend>rospy</run_depend>
+
+  <build_depend>ros_bridge</build_depend>
+  <run_depend>ros_bridge</run_depend>
+  
+  <build_depend>tf</build_depend>
+  <run_depend>tf</run_depend>
+
+  <build_depend>serial</build_depend>
+  <run_depend>serial</run_depend>
+
+  <build_depend>tf2</build_depend>
+  <run_depend>tf2</run_depend>
+
+  <build_depend>tf2_ros</build_depend>
+  <run_depend>tf2_ros</run_depend>
+
+  <build_depend>tf2_sensor_msgs</build_depend>
+  <run_depend>tf2_sensor_msgs</run_depend>
+
+  <build_depend>std_msgs</build_depend>
+  <run_depend>std_msgs</run_depend>
+
+  <build_depend>geometry_msgs</build_depend>
+  <run_depend>geometry_msgs</run_depend>
+
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_runtime</run_depend>
+
+</package>

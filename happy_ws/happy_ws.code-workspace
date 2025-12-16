@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": "../dependencies"
+        },
+        {
+            "path": "."
+        },
+        {
+            "path": "../imu_ws"
+        }
+    ]
+}

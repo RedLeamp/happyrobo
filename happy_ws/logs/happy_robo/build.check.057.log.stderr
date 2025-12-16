@@ -1,0 +1,26 @@
+CMake Warning (dev) at CMakeLists.txt:2 (project):
+  Policy CMP0048 is not set: project() command manages VERSION variables.
+  Run "cmake --help-policy CMP0048" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+
+  The following variable(s) would be set to empty:
+
+    CMAKE_PROJECT_VERSION
+    CMAKE_PROJECT_VERSION_MAJOR
+    CMAKE_PROJECT_VERSION_MINOR
+    CMAKE_PROJECT_VERSION_PATCH
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+[31m[1mCMake Error[0m at /usr/share/cmake-3.16/Modules/FindPackageHandleStandardArgs.cmake:146 (message):
+  Could NOT find Python (missing: Python_LIBRARIES Python_INCLUDE_DIRS
+  Development) (found suitable version "3.9.5", minimum required is "3.8")
+[36mCall Stack (most recent call first):[0m
+  /usr/share/cmake-3.16/Modules/FindPackageHandleStandardArgs.cmake:393 (_FPHSA_FAILURE_MESSAGE)
+  /usr/share/cmake-3.16/Modules/FindPython/Support.cmake:2214 (find_package_handle_standard_args)
+  /usr/share/cmake-3.16/Modules/FindPython.cmake:304 (include)
+  /home/happy/happy_ws/build/happy_robo/_deps/pybind11-src/tools/pybind11NewTools.cmake:54 (find_package)
+  /home/happy/happy_ws/build/happy_robo/_deps/pybind11-src/tools/pybind11Common.cmake:204 (include)
+  /home/happy/happy_ws/build/happy_robo/_deps/pybind11-src/CMakeLists.txt:296 (include)
+
+
+make: *** [Makefile:2258: cmake_check_build_system] Error 1

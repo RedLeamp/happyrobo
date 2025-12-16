@@ -1,0 +1,8 @@
+CMake Error: The following variables are used in this project, but they are set to NOTFOUND.
+Please set them or make sure they are set and tested correctly in the CMake files:
+GMOCK_LIBRARY (ADVANCED)
+    linked by target "time_conversion_test" in directory /home/happy/happy_ws/src/cartographer_ros/cartographer_ros
+    linked by target "configuration_files_test" in directory /home/happy/happy_ws/src/cartographer_ros/cartographer_ros
+    linked by target "msg_conversion_test" in directory /home/happy/happy_ws/src/cartographer_ros/cartographer_ros
+    linked by target "metrics_test" in directory /home/happy/happy_ws/src/cartographer_ros/cartographer_ros
+

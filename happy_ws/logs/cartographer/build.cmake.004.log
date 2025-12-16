@@ -1,0 +1,13 @@
+Not searching for unused variables given on the command line.
+[36m--[0m Build type: Release
+[36m--[0m Found GMock: /usr/lib/aarch64-linux-gnu/libgmock_main.a;/usr/lib/aarch64-linux-gnu/libgmock.a;/usr/lib/aarch64-linux-gnu/libgtest.a;-lpthread
+[36m--[0m Found installed version of Eigen: /usr/lib/cmake/eigen3
+[36m--[0m Found required Ceres dependency: Eigen version 3.3.7 in /usr/include/eigen3
+[36m--[0m Found required Ceres dependency: glog
+[36m--[0m Found installed version of gflags: /usr/lib/aarch64-linux-gnu/cmake/gflags
+[36m--[0m Detected gflags version: 2.2.2
+[36m--[0m Found required Ceres dependency: gflags
+[36m--[0m Found Ceres version: 1.14.0 installed in: /usr with components: [EigenSparse, SparseLinearAlgebraLibrary, LAPACK, SuiteSparse, CXSparse, SchurSpecializations, OpenMP, Multithreading]
+[36m--[0m Configuring done
+[36m--[0m Generating done
+[36m--[0m Build files have been written to: /home/happy/happy_ws/build/cartographer

@@ -1,0 +1,4 @@
+Symlinking /home/happy/happy_ws/devel/share/cartographer_rviz/cmake/cartographer_rvizConfig-version.cmake
+Symlinking /home/happy/happy_ws/devel/share/cartographer_rviz/cmake/cartographer_rvizConfig.cmake
+Symlinking /home/happy/happy_ws/devel/lib/libcartographer_rviz.so
+Symlinking /home/happy/happy_ws/devel/lib/pkgconfig/cartographer_rviz.pc

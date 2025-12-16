@@ -1,0 +1,7 @@
+
+[31;01mExtension error:[39;49;00m
+Could not import extension sphinx.builders.latex (exception: cannot import name 'contextfunction' from 'jinja2' (/home/happy/.local/lib/python3.8/site-packages/jinja2/__init__.py))
+make[2]: *** [docs/CMakeFiles/build_doc.dir/build.make:58: docs/CMakeFiles/build_doc] Error 2
+make[1]: *** [CMakeFiles/Makefile2:2697: docs/CMakeFiles/build_doc.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+make: *** [Makefile:141: all] Error 2

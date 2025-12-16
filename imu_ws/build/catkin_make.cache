@@ -1,0 +1,2 @@
+ros_imu_ws/src
+-DCATKIN_DEVEL_PREFIX=/home/happy/imu_ws/devel -DCMAKE_INSTALL_PREFIX=/home/happy/imu_ws/install -G Unix Makefiles
